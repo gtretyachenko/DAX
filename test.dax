@@ -1,0 +1,24 @@
+/* START QUERY BUILDER */
+DEFINE
+MEASURE fact_sales_stock_custom[Sales] = CALCULATE(SUM(fact_sales_stock_custom[Count]),fact_sales_stock_custom[TypeFact]="Продано")dim_products[CategoryGoods]
+SELECT 
+ [OBJECT_TYPE] AS [Object Type], 
+ [TABLE] AS [Object's Table], 
+ [OBJECT] AS [Object], 
+ [REFERENCED_TABLE] AS [Referenced Table], 
+ [REFERENCED_OBJECT] AS [Referenced Object], 
+ [REFERENCED_OBJECT_TYPE] AS [Referenced Object Type] 
+FROM $SYSTEM.DISCOVER_CALC_DEPENDENCY 
+WHERE [REFERENCED_OBJECT] = 'CategoryGoods'
+ AND [REFERENCED_TABLE] = 'dim_products'
+ORDER BY [OBJECT_TYPE]
+
+EVALUATE
+SUMMARIZECOLUMNS(
+    dim_products[CategoryGoods],
+    KEEPFILTERS( FILTER( ALL( dim_products[CategoryGoods] ), SEARCH( "", dim_products[CategoryGoods], 1, 0 ) >= 1 )),
+    "Sales", [Sales]
+)
+ORDER BY 
+    dim_products[CategoryGoods] ASC
+/* END QUERY BUILDER */
